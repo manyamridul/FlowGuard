@@ -1,0 +1,811 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================================================
+   FLOWGUARD — PREMIUM GLOBAL DESIGN SYSTEM
+   ========================================================= */
+
+:root {
+  --fg-bg: #070b14;
+  --fg-bg-deep: #030712;
+
+  --fg-surface: rgba(15, 23, 42, 0.82);
+  --fg-surface-solid: #0f172a;
+  --fg-surface-soft: #111827;
+
+  --fg-border: rgba(148, 163, 184, 0.16);
+  --fg-border-strong: rgba(148, 163, 184, 0.28);
+
+  --fg-text: #f8fafc;
+  --fg-text-secondary: #cbd5e1;
+  --fg-text-muted: #94a3b8;
+
+  --fg-primary: #2563eb;
+  --fg-primary-dark: #1d4ed8;
+  --fg-primary-light: #60a5fa;
+
+  --fg-purple: #7c3aed;
+  --fg-success: #16a34a;
+  --fg-warning: #d97706;
+  --fg-danger: #dc2626;
+
+  --fg-radius-sm: 8px;
+  --fg-radius-md: 12px;
+  --fg-radius-lg: 16px;
+  --fg-radius-xl: 22px;
+
+  --fg-shadow-sm:
+    0 4px 14px rgba(15, 23, 42, 0.045);
+
+  --fg-shadow-md:
+    0 12px 30px rgba(15, 23, 42, 0.075);
+
+  --fg-shadow-lg:
+    0 24px 60px rgba(15, 23, 42, 0.11);
+
+  --fg-shadow-blue:
+    0 12px 30px rgba(37, 99, 235, 0.18);
+
+  --fg-transition:
+    220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================================
+   GLOBAL RESET
+   ========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  background-color: #070b14;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  position: relative;
+
+  font-family:
+    "Inter",
+    "Segoe UI",
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+
+  background:
+    radial-gradient(
+      1100px circle at 8% -8%,
+      rgba(37, 99, 235, 0.28),
+      transparent 42%
+    ),
+    radial-gradient(
+      900px circle at 95% 5%,
+      rgba(79, 70, 229, 0.22),
+      transparent 40%
+    ),
+    radial-gradient(
+      800px circle at 50% 100%,
+      rgba(14, 165, 233, 0.12),
+      transparent 48%
+    ),
+    linear-gradient(
+      155deg,
+      #070b14 0%,
+      #0b1220 40%,
+      #111827 100%
+    );
+
+  color: var(--fg-text);
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background:
+    radial-gradient(
+      420px circle at 18% 22%,
+      rgba(37, 99, 235, 0.18),
+      transparent 70%
+    ),
+    radial-gradient(
+      380px circle at 82% 70%,
+      rgba(79, 70, 229, 0.14),
+      transparent 68%
+    );
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   SELECTION
+   ========================================================= */
+
+::selection {
+  background: rgba(37, 99, 235, 0.18);
+  color: #0f172a;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* =========================================================
+   BASIC ELEMENTS
+   ========================================================= */
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* =========================================================
+   PREMIUM GLASS
+   ========================================================= */
+
+.fg-glass {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+/* =========================================================
+   PREMIUM CARD
+   ========================================================= */
+
+.fg-card {
+  position: relative;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--fg-radius-lg);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.28);
+
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  color: #e2e8f0;
+
+  transition:
+    transform var(--fg-transition),
+    box-shadow var(--fg-transition),
+    border-color var(--fg-transition);
+}
+
+.fg-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--fg-shadow-md);
+  border-color: rgba(59, 130, 246, 0.18);
+}
+
+/* =========================================================
+   PREMIUM BUTTON
+   ========================================================= */
+
+.fg-button {
+  position: relative;
+  overflow: hidden;
+
+  transition:
+    transform 160ms ease,
+    box-shadow 220ms ease,
+    filter 220ms ease;
+}
+
+.fg-button::after {
+  content: "";
+  position: absolute;
+
+  top: 0;
+  left: -120%;
+
+  width: 80%;
+  height: 100%;
+
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.22),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+  transition: left 550ms ease;
+}
+
+.fg-button:hover::after {
+  left: 140%;
+}
+
+.fg-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.02);
+}
+
+.fg-button:active {
+  transform: scale(0.98);
+}
+
+/* =========================================================
+   PREMIUM GLOW
+   ========================================================= */
+
+.fg-glow {
+  box-shadow:
+    0 0 0 1px rgba(37, 99, 235, 0.04),
+    0 15px 45px rgba(37, 99, 235, 0.13);
+}
+
+/* =========================================================
+   GRADIENT TEXT
+   ========================================================= */
+
+.fg-gradient-text {
+  background: linear-gradient(
+    135deg,
+    #2563eb,
+    #4f46e5
+  );
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fg-card-static {
+  position: relative;
+  background: #0f172a !important;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: var(--fg-radius-lg);
+  box-shadow: var(--fg-shadow-sm);
+  color: #e2e8f0;
+
+  transition:
+    transform var(--fg-transition),
+    box-shadow var(--fg-transition),
+    border-color var(--fg-transition);
+}
+
+.fg-card-static:hover {
+  border-color: rgba(59, 130, 246, 0.22);
+}
+
+.fg-card-title {
+  color: #f1f5f9;
+}
+
+.fg-overview-row {
+  border-radius: 0.75rem;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.fg-overview-row:hover {
+  transform: translateY(-1px);
+}
+
+.fg-overview-label {
+  color: #e2e8f0;
+}
+
+/* =========================================================
+   PAGE ANIMATION
+   ========================================================= */
+
+.page-enter {
+  animation:
+    fgPageEnter
+    420ms
+    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fgPageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   CONTENT AREA — SHARED HOVER MOTION (ALL SIDEBAR PAGES)
+   ========================================================= */
+
+.content-area tbody tr {
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.content-area tbody tr:hover {
+  transform: translateY(-1px);
+}
+
+.content-area [class*="rounded-xl"][class*="border"]:not(.fg-card):not(.fg-card-static):not([class*="border-dashed"]):not(input):not(select):not(textarea):not(button):not(a),
+.content-area [class*="rounded-2xl"][class*="border"]:not(.fg-card):not(.fg-card-static):not([class*="border-dashed"]):not(input):not(select):not(textarea):not(button):not(a) {
+  transition:
+    transform var(--fg-transition),
+    box-shadow var(--fg-transition),
+    border-color var(--fg-transition);
+}
+
+.content-area [class*="rounded-xl"][class*="border"]:not(.fg-card):not(.fg-card-static):not([class*="border-dashed"]):not(input):not(select):not(textarea):not(button):not(a):hover,
+.content-area [class*="rounded-2xl"][class*="border"]:not(.fg-card):not(.fg-card-static):not([class*="border-dashed"]):not(input):not(select):not(textarea):not(button):not(a):hover {
+  transform: translateY(-2px);
+  box-shadow: var(--fg-shadow-md);
+}
+
+/* =========================================================
+   FADE UP
+   ========================================================= */
+
+.fade-up {
+  animation:
+    fgFadeUp
+    500ms
+    cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fgFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================================================
+   FLOATING
+   ========================================================= */
+
+.float-soft {
+  animation: fgFloat 5s ease-in-out infinite;
+}
+
+@keyframes fgFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* =========================================================
+   STATUS DOTS
+   ========================================================= */
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+
+  display: inline-block;
+
+  border-radius: 50%;
+}
+
+.status-dot-active {
+  background: #22c55e;
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.12);
+}
+
+.status-dot-warning {
+  background: #f59e0b;
+  box-shadow:
+    0 0 0 4px rgba(245, 158, 11, 0.12);
+}
+
+.status-dot-danger {
+  background: #ef4444;
+  box-shadow:
+    0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+/* =========================================================
+   INPUT FOCUS
+   ========================================================= */
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+tbody tr {
+  transition:
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+tbody tr:hover {
+  background: rgba(248, 250, 252, 0.85);
+}
+
+/* =========================================================
+   PREMIUM FORM CONTROLS
+   ========================================================= */
+
+input,
+select,
+textarea {
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+/* =========================================================
+   PREMIUM SELECTION / CHECKBOX
+   ========================================================= */
+
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--fg-primary);
+}
+
+/* =========================================================
+   THEME SYSTEM
+   ========================================================= */
+
+html[data-theme="light"] {
+  --fg-bg: #dce8f8;
+  --fg-surface: rgba(255, 255, 255, 0.78);
+  --fg-surface-solid: #ffffff;
+  --fg-surface-soft: #eef4fb;
+
+  --fg-border: rgba(148, 163, 184, 0.18);
+
+  --fg-text: #0f172a;
+  --fg-text-secondary: #475569;
+  --fg-text-muted: #94a3b8;
+}
+
+html[data-theme="dark"],
+body.theme-dark {
+  color-scheme: dark;
+  --fg-bg: #070b14;
+  --fg-surface: rgba(15, 23, 42, 0.88);
+  --fg-surface-solid: #0f172a;
+  --fg-surface-soft: #111c2f;
+
+  --fg-border: rgba(148, 163, 184, 0.16);
+
+  --fg-text: #f8fafc;
+  --fg-text-secondary: #cbd5e1;
+  --fg-text-muted: #94a3b8;
+
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(37, 99, 235, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 15%,
+      rgba(124, 58, 237, 0.1),
+      transparent 25%
+    ),
+    #070b14 !important;
+
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .fg-card-title,
+html[data-theme="dark"] .fg-overview-label {
+  color: #e2e8f0 !important;
+}
+
+html[data-theme="dark"] .fg-overview-row:hover {
+  background: #1e293b !important;
+}
+
+html[data-theme="dark"] body {
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(37, 99, 235, 0.12),
+      transparent 28%
+    ),
+    #070b14 !important;
+
+  color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .fg-card-static {
+  background: #0f172a !important;
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #e2e8f0;
+}
+
+/* =========================================================
+   DARK MODE — COMMON SURFACES
+   ========================================================= */
+
+html[data-theme="dark"] .fg-card,
+html[data-theme="dark"] .fg-glass {
+  background: rgba(15, 23, 42, 0.78);
+  border-color: rgba(148, 163, 184, 0.14);
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background: #111c2f !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder {
+  color: #64748b;
+}
+
+html[data-theme="dark"] tbody tr:hover {
+  background: rgba(30, 41, 59, 0.65);
+}
+
+/* =========================================================
+   ACCENT COLORS
+   ========================================================= */
+
+html[data-accent="blue"] {
+  --fg-primary: #2563eb;
+  --fg-primary-dark: #1d4ed8;
+}
+
+html[data-accent="purple"] {
+  --fg-primary: #9333ea;
+  --fg-primary-dark: #7e22ce;
+}
+
+html[data-accent="green"] {
+  --fg-primary: #16a34a;
+  --fg-primary-dark: #15803d;
+}
+
+html[data-accent="orange"] {
+  --fg-primary: #f97316;
+  --fg-primary-dark: #ea580c;
+}
+
+html[data-accent="red"] {
+  --fg-primary: #ef4444;
+  --fg-primary-dark: #dc2626;
+}
+
+/* =========================================================
+   COMPACT MODE
+   ========================================================= */
+
+body.compact-mode .content-area {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+body.compact-mode .card {
+  padding: 12px !important;
+}
+
+/* =========================================================
+   ACCESSIBILITY
+   ========================================================= */
+
+:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.55);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html:not(.login-motion-enabled) *,
+  html:not(.login-motion-enabled) *::before,
+  html:not(.login-motion-enabled) *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .fg-card:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   DEFAULT DARK SURFACES (all pages)
+   ========================================================= */
+
+.app-shell,
+.content-area,
+.login-page {
+  color: #e2e8f0;
+}
+
+.app-shell .bg-white:not(button):not(.fg-button),
+.content-area .bg-white:not(button):not(.fg-button),
+.login-page .bg-white:not(button):not(.fg-button),
+.app-shell .bg-slate-50,
+.content-area .bg-slate-50,
+.app-shell .bg-gray-50,
+.content-area .bg-gray-50,
+.app-shell .bg-gray-100,
+.content-area .bg-gray-100 {
+  background-color: #0f172a !important;
+  color: #e2e8f0;
+}
+
+.app-shell .bg-red-50,
+.content-area .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.55) !important;
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.35) !important;
+}
+
+.app-shell .hover\:bg-gray-50:hover,
+.content-area .hover\:bg-gray-50:hover,
+.app-shell .hover\:bg-slate-50:hover,
+.content-area .hover\:bg-slate-50:hover {
+  background-color: #1e293b !important;
+}
+
+.app-shell .text-slate-900,
+.app-shell .text-gray-900,
+.content-area .text-slate-900,
+.content-area .text-gray-900 {
+  color: #f1f5f9 !important;
+}
+
+.app-shell .text-slate-800,
+.app-shell .text-slate-700,
+.app-shell .text-gray-700,
+.content-area .text-slate-800,
+.content-area .text-slate-700,
+.content-area .text-gray-700 {
+  color: #cbd5e1 !important;
+}
+
+.app-shell .text-slate-600,
+.app-shell .text-slate-500,
+.app-shell .text-gray-600,
+.app-shell .text-gray-500,
+.app-shell .text-gray-400,
+.content-area .text-slate-600,
+.content-area .text-slate-500,
+.content-area .text-gray-600,
+.content-area .text-gray-500,
+.content-area .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+.app-shell .border-slate-200,
+.app-shell .border-gray-200,
+.content-area .border-slate-200,
+.content-area .border-gray-200 {
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+.app-shell input,
+.app-shell textarea,
+.app-shell select,
+.content-area input,
+.content-area textarea,
+.content-area select {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
