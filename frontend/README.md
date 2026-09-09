@@ -107,7 +107,7 @@ frontend/
 
 ## Development Notes
 
-- Open the UI at http://localhost:3000. The backend API is http://127.0.0.1:8000/api.
+- Open the UI at http://localhost:3000. The backend API is http://127.0.0.1:8001/api.
 - Authentication, dashboard, projects, workflows, tasks, and related modules use `src/services/api.js`. Do not replace that file with a static mock client.
 - Sign in with email and password.
 
