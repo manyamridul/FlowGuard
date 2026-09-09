@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from projects.models import ProjectMember
+
 from .models import Task
 
 
@@ -61,22 +63,73 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
 
+        # -------------------------------------------------
+        # GET PROJECT
+        # -------------------------------------------------
+
         project = attrs.get(
             "project",
             getattr(self.instance, "project", None),
         )
+
+        if not project:
+            raise serializers.ValidationError({
+                "project": "Project is required."
+            })
+
+        # -------------------------------------------------
+        # GET WORKFLOW
+        # -------------------------------------------------
 
         workflow = attrs.get(
             "workflow",
             getattr(self.instance, "workflow", None),
         )
 
-        if project and workflow:
-            if workflow.project_id != project.id:
+        if not workflow:
+            raise serializers.ValidationError({
+                "workflow": "Workflow is required."
+            })
+
+        # -------------------------------------------------
+        # WORKFLOW MUST BELONG TO PROJECT
+        # -------------------------------------------------
+
+        if workflow.project_id != project.id:
+
+            raise serializers.ValidationError({
+                "workflow": (
+                    "This workflow does not belong "
+                    "to the selected project."
+                )
+            })
+
+        # -------------------------------------------------
+        # ASSIGNEE MUST BELONG TO PROJECT
+        # -------------------------------------------------
+
+        assigned_to = attrs.get(
+            "assigned_to",
+            getattr(self.instance, "assigned_to", None),
+        )
+
+        if assigned_to:
+
+            is_member = ProjectMember.objects.filter(
+                project=project,
+                user=assigned_to,
+            ).exists()
+
+            is_creator = (
+                project.created_by_id == assigned_to.id
+            )
+
+            if not is_member and not is_creator:
+
                 raise serializers.ValidationError({
-                    "workflow": (
-                        "This workflow does not belong "
-                        "to the selected project."
+                    "assigned_to": (
+                        "This user is not a member "
+                        "of the selected project."
                     )
                 })
 

@@ -19,7 +19,7 @@ class TaskViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
 
-        return (
+        queryset = (
             Task.objects
             .select_related(
                 "project",
@@ -27,20 +27,32 @@ class TaskViewSet(viewsets.ModelViewSet):
                 "assigned_to",
                 "created_by",
             )
-            .filter(
-                Q(project__created_by=user) |
-                Q(project__members__user=user)
-            )
-            .distinct()
         )
+
+        # ADMIN can see ALL tasks
+        if user.role == "ADMIN":
+            return queryset.all()
+
+        # Normal users can see tasks only
+        # from projects they created or joined
+        return queryset.filter(
+            Q(project__created_by=user) |
+            Q(project__members__user=user)
+        ).distinct()
 
     def _has_project_access(self, project):
 
         user = self.request.user
 
+        # ADMIN -> full access to every project
+        if user.role == "ADMIN":
+            return True
+
+        # Project creator -> full access
         if project.created_by_id == user.id:
             return True
 
+        # Project member -> access
         return ProjectMember.objects.filter(
             project=project,
             user=user,

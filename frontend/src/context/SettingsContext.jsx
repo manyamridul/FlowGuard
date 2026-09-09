@@ -8,7 +8,9 @@ import React, {
 
 const SettingsContext = createContext(null);
 
-const API_URL = "http://127.0.0.1:8000/api/users/settings/";
+//const API_URL = "http://127.0.0.1:8001/api/users/settings/";
+const API_URL =
+  `${window.location.protocol}//${window.location.hostname}:8001/api/users/settings/`;
 
 const defaultSettings = {
   workspace_name: "Flow Guard",

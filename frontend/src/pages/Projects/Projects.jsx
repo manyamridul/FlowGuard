@@ -46,6 +46,7 @@ const emptyProject = {
   due_date: "",
   sdlc: "REQUIREMENTS",
   percentComplete: "",
+  member_ids: [],
 };
 
 const fieldClass =
@@ -54,6 +55,7 @@ const fieldClass =
 const ProjectForm = ({
   formData,
   setFormData,
+  users,
   saving,
   apiError,
   onSubmit,
@@ -191,6 +193,71 @@ const ProjectForm = ({
           disabled={saving}
         />
       </div>
+    </div>
+
+    {/* =====================================================
+        PROJECT MEMBERS
+    ===================================================== */}
+
+    <div>
+      <label className="mb-2 block text-sm font-medium text-gray-700">
+        Add Project Members
+      </label>
+
+      <div className="max-h-40 overflow-y-auto rounded-lg border border-gray-300 bg-white p-2">
+        {users.length === 0 ? (
+          <p className="px-2 py-2 text-sm text-gray-500">
+            No active users available.
+          </p>
+        ) : (
+          users.map((user) => (
+            <label
+              key={user.id}
+              className="flex cursor-pointer items-center gap-3 rounded-md px-3 py-2 hover:bg-gray-100"
+            >
+              <input
+                type="checkbox"
+                checked={formData.member_ids.includes(user.id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setFormData({
+                      ...formData,
+                      member_ids: [
+                        ...formData.member_ids,
+                        user.id,
+                      ],
+                    });
+                  } else {
+                    setFormData({
+                      ...formData,
+                      member_ids: formData.member_ids.filter(
+                        (id) => id !== user.id
+                      ),
+                    });
+                  }
+                }}
+                disabled={saving}
+              />
+
+              <span className="text-sm text-gray-700">
+                {user.first_name || user.username}
+                {user.email && (
+                  <span className="ml-2 text-xs text-gray-400">
+                    ({user.email})
+                  </span>
+                )}
+              </span>
+            </label>
+          ))
+        )}
+      </div>
+
+      {formData.member_ids.length > 0 && (
+        <p className="mt-2 text-xs text-gray-500">
+          {formData.member_ids.length} user
+          {formData.member_ids.length !== 1 ? "s" : ""} selected
+        </p>
+      )}
     </div>
 
     <div className="grid grid-cols-2 gap-4">
@@ -345,24 +412,46 @@ const Projects = () => {
       setSaving(true);
       setApiError("");
 
-      const createdProject = await createProject({
+      const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         status: formData.status,
         priority: formData.priority,
         start_date: formData.start_date || null,
         due_date: formData.due_date || null,
-      });
+
+        // Selected users
+        member_ids: formData.member_ids || [],
+      };
+
+      console.log("CREATE PROJECT PAYLOAD:", payload);
+
+      const createdProject = await createProject(payload);
 
       persistExtras(createdProject.id, formData);
-      setProjects((prev) => [createdProject, ...prev]);
+
+      setProjects((prev) => [
+        createdProject,
+        ...prev,
+      ]);
+
       setFormData(emptyProject);
       setIsCreateOpen(false);
+
     } catch (error) {
       console.error("Create project failed:", error);
-      setApiError(
-        error.response?.data?.detail || "Failed to create project."
+
+      console.error(
+        "Backend error:",
+        error.response?.data
       );
+
+      setApiError(
+        error.response?.data?.detail ||
+        error.response?.data?.member_ids?.[0] ||
+        "Failed to create project."
+      );
+
     } finally {
       setSaving(false);
     }
@@ -375,29 +464,55 @@ const Projects = () => {
       setSaving(true);
       setApiError("");
 
-      const updatedProject = await updateProject(editingId, {
+      const payload = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         status: formData.status,
         priority: formData.priority,
         start_date: formData.start_date || null,
         due_date: formData.due_date || null,
-      });
+
+        // IMPORTANT
+        member_ids: Array.isArray(formData.member_ids)
+          ? formData.member_ids
+          : [],
+      };
+
+      console.log("UPDATE PROJECT PAYLOAD:", payload);
+
+      const updatedProject = await updateProject(
+        editingId,
+        payload
+      );
 
       persistExtras(editingId, formData);
+
       setProjects((prev) =>
         prev.map((project) =>
-          project.id === editingId ? updatedProject : project
+          project.id === editingId
+            ? updatedProject
+            : project
         )
       );
+
       setFormData(emptyProject);
       setEditingId(null);
       setIsEditOpen(false);
+
     } catch (error) {
       console.error("Update project failed:", error);
-      setApiError(
-        error.response?.data?.detail || "Failed to update project."
+
+      console.error(
+        "Backend error:",
+        error.response?.data
       );
+
+      setApiError(
+        error.response?.data?.detail ||
+        error.response?.data?.member_ids?.[0] ||
+        "Failed to update project."
+      );
+
     } finally {
       setSaving(false);
     }
@@ -428,6 +543,16 @@ const Projects = () => {
 
   const openEdit = (project) => {
     setEditingId(project.id);
+
+    // Get existing project members safely
+    const existingMemberIds = Array.isArray(project.member_ids)
+      ? project.member_ids
+      : Array.isArray(project.members)
+        ? project.members
+            .map((member) => member.user_id || member.user?.id)
+            .filter(Boolean)
+        : [];
+
     setFormData({
       name: project.name || "",
       description: project.description || "",
@@ -437,7 +562,13 @@ const Projects = () => {
       due_date: project.due_date || "",
       sdlc: getProjectSdlc(project),
       percentComplete: getProjectPercent(project, tasks),
-    });
+
+      // Existing members from backend
+      member_ids: Array.isArray(project.current_member_ids)
+        ? project.current_member_ids
+        : [],
+      });
+
     setApiError("");
     setIsEditOpen(true);
   };
@@ -716,6 +847,7 @@ const Projects = () => {
         <ProjectForm
           formData={formData}
           setFormData={setFormData}
+          users={users}
           saving={saving}
           apiError={apiError}
           onSubmit={handleCreate}
@@ -743,6 +875,7 @@ const Projects = () => {
         <ProjectForm
           formData={formData}
           setFormData={setFormData}
+          users={users}
           saving={saving}
           apiError={apiError}
           onSubmit={handleEdit}

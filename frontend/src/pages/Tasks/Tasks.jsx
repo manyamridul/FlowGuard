@@ -207,7 +207,7 @@ const TaskForm = ({
     <div className="grid grid-cols-2 gap-4">
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
-          Assignee
+          Assign To
         </label>
         <select
           value={formData.assigned_to}
@@ -217,15 +217,26 @@ const TaskForm = ({
               assigned_to: e.target.value,
             })
           }
+          disabled={!formData.project || saving}
           className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
         >
           <option value="">Unassigned</option>
           {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.name || user.username || user.email}
+            <option
+              key={user.id}
+              value={user.id}
+            >
+              {user.first_name
+                ? `${user.first_name} ${user.last_name || ""}`.trim()
+                : user.username || user.email}
             </option>
           ))}
         </select>
+        {formData.project && users.length === 0 && (
+          <p className="mt-1 text-xs text-gray-500">
+            No members are available for this project.
+          </p>
+        )}
       </div>
 
       <div>
@@ -355,6 +366,33 @@ const Tasks = () => {
         Number(workflow.project) === Number(formData.project)
     );
   }, [workflows, formData.project]);
+
+  const availableUsers = useMemo(() => {
+    if (!formData.project) {
+      return [];
+    }
+
+    const selectedProject = projects.find(
+      (project) =>
+        Number(project.id) === Number(formData.project)
+    );
+
+    if (!selectedProject) {
+      return [];
+    }
+
+    const memberIds = Array.isArray(selectedProject.member_ids)
+      ? selectedProject.member_ids.map(Number)
+      : [];
+
+    return users.filter((user) =>
+      memberIds.includes(Number(user.id))
+    );
+  }, [
+    users,
+    projects,
+    formData.project,
+  ]);
 
   // =========================================================
   // FILTER TASKS
@@ -836,7 +874,7 @@ const Tasks = () => {
           setFormData={setFormData}
           projects={projects}
           availableWorkflows={availableWorkflows}
-          users={users}
+          users={availableUsers}
           saving={saving}
           onSubmit={handleCreate}
           submitLabel="Create Task"
@@ -863,7 +901,7 @@ const Tasks = () => {
           setFormData={setFormData}
           projects={projects}
           availableWorkflows={availableWorkflows}
-          users={users}
+          users={availableUsers}
           saving={saving}
           onSubmit={handleEdit}
           submitLabel="Save Changes"

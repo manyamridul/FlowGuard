@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.migrations import serializer
 from django.shortcuts import get_object_or_404
 
 from rest_framework import status, viewsets
@@ -17,6 +18,7 @@ from .permissions import (
 class ProjectViewSet(viewsets.ModelViewSet):
 
     serializer_class = ProjectSerializer
+
     permission_classes = [
         IsAuthenticated,
         IsProjectMemberOrAdmin,
@@ -26,32 +28,31 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
         user = self.request.user
 
-        # ADMIN can see everything
+        # ADMIN -> SEE ALL PROJECTS
         if user.role == "ADMIN":
+
             return Project.objects.select_related(
                 "created_by"
             ).prefetch_related(
                 "members"
             ).all()
 
-        # Normal users only see:
-        # 1. Projects they created
-        # 2. Projects they are members of
+        # NORMAL USER -> ONLY THEIR PROJECTS
+        # OR PROJECTS THEY ARE MEMBERS OF
+
         return Project.objects.select_related(
             "created_by"
         ).prefetch_related(
             "members"
         ).filter(
-            models.Q(created_by=user) |
+            models.Q(created_by=user)
+            |
             models.Q(members__user=user)
         ).distinct()
 
     def perform_create(self, serializer):
 
-        serializer.save(
-            created_by=self.request.user
-        )
-
+        serializer.save()
 
 class ProjectMemberViewSet(viewsets.ModelViewSet):
 

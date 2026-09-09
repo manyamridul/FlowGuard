@@ -6,13 +6,13 @@ class IsProjectMemberOrAdmin(BasePermission):
     Project access rules:
 
     ADMIN:
-        Full access.
+        Full access to every project.
 
     Project creator:
         Full access.
 
     Project member:
-        Read access.
+        Full access to the project.
 
     Everyone else:
         No access.
@@ -28,27 +28,51 @@ class IsProjectMemberOrAdmin(BasePermission):
 
         user = request.user
 
-        # ADMIN has full access
+        # -------------------------------------------------
+        # ADMIN -> FULL ACCESS
+        # -------------------------------------------------
+
         if user.role == "ADMIN":
             return True
 
-        # Project creator has full access
+        # -------------------------------------------------
+        # PROJECT CREATOR -> FULL ACCESS
+        # -------------------------------------------------
+
         if obj.created_by_id == user.id:
             return True
 
-        # Members can read
-        if request.method in ("GET", "HEAD", "OPTIONS"):
-            return obj.members.filter(
-                user_id=user.id
-            ).exists()
+        # -------------------------------------------------
+        # PROJECT MEMBER -> FULL ACCESS
+        # -------------------------------------------------
 
-        # Members cannot modify/delete by default
+        if obj.members.filter(
+            user_id=user.id
+        ).exists():
+            return True
+
+        # -------------------------------------------------
+        # NOT A MEMBER -> NO ACCESS
+        # -------------------------------------------------
+
         return False
 
 
 class IsProjectManagerOrAdmin(BasePermission):
     """
     Used for project member management.
+
+    ADMIN:
+        Full access to all projects.
+
+    Project creator:
+        Full access.
+
+    Any project member:
+        Full access to this project's member management.
+
+    Non-members:
+        No access.
     """
 
     def has_permission(self, request, view):
@@ -61,20 +85,31 @@ class IsProjectManagerOrAdmin(BasePermission):
 
         user = request.user
 
+        # -------------------------------------------------
+        # ADMIN -> FULL ACCESS
+        # -------------------------------------------------
+
         if user.role == "ADMIN":
             return True
+
+        # -------------------------------------------------
+        # PROJECT CREATOR -> FULL ACCESS
+        # -------------------------------------------------
 
         if obj.created_by_id == user.id:
             return True
 
-        membership = obj.members.filter(
-            user_id=user.id
-        ).first()
+        # -------------------------------------------------
+        # ANY PROJECT MEMBER -> FULL ACCESS
+        # -------------------------------------------------
 
-        if membership and membership.role in [
-            "OWNER",
-            "MANAGER",
-        ]:
+        if obj.members.filter(
+            user_id=user.id
+        ).exists():
             return True
+
+        # -------------------------------------------------
+        # NOT A MEMBER -> NO ACCESS
+        # -------------------------------------------------
 
         return False

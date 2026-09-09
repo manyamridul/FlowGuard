@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://127.0.0.1:8001/api";
+//const API_BASE_URL = "http://127.0.0.1:8001/api";
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  `${window.location.protocol}//${window.location.hostname}:8001/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +12,42 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+// =========================================================
+// API ERROR HELPER
+// =========================================================
+
+export const getApiErrorMessage = (error) => {
+  const data = error.response?.data;
+
+  if (!data) {
+    return error.message || "Unable to connect to the server.";
+  }
+
+  // Django REST Framework detail/message
+  if (data.detail) {
+    return data.detail;
+  }
+
+  if (data.message) {
+    return data.message;
+  }
+
+  // Django serializer validation errors
+  if (typeof data === "object") {
+    return Object.entries(data)
+      .map(([field, messages]) => {
+        const message = Array.isArray(messages)
+          ? messages.join(", ")
+          : String(messages);
+
+        return `${field}: ${message}`;
+      })
+      .join(" | ");
+  }
+
+  return "Request failed.";
+};
 
 // =========================================================
 // REQUEST INTERCEPTOR
@@ -48,7 +87,8 @@ api.interceptors.response.use(
     if (
       error.response.status !== 401 ||
       !originalRequest ||
-      originalRequest._retry
+      originalRequest._retry ||
+      originalRequest.skipAuthRefresh
     ) {
       return Promise.reject(error);
     }
@@ -169,30 +209,36 @@ export const loginUser = async (credentials) => {
 
 export const registerUser = async (userData) => {
   try {
+    console.log("REGISTER PAYLOAD:", userData);
+    console.log(
+      "REGISTER URL:",
+      `${API_BASE_URL}/auth/register/`
+    );
+
     const response = await api.post(
       "/auth/register/",
-      userData
+      userData,
+      {
+        skipAuthRefresh: true,
+      }
+    );
+
+    console.log(
+      "REGISTER RESPONSE:",
+      response.data
     );
 
     return response.data;
+
   } catch (error) {
-    const data = error.response?.data;
+    console.error(
+      "REGISTER ERROR:",
+      error.response?.data || error
+    );
 
-    if (data && typeof data === "object") {
-      const firstError = Object.values(data)[0];
-
-      const message = Array.isArray(firstError)
-        ? firstError[0]
-        : data.detail || data.message || firstError;
-
-      throw new Error(
-        typeof message === "string"
-          ? message
-          : "Unable to create account."
-      );
-    }
-
-    throw new Error("Unable to create account.");
+    throw new Error(
+      getApiErrorMessage(error)
+    );
   }
 };
 
@@ -275,6 +321,54 @@ export const createProject = async (projectData) => {
 };
 
 // =========================================================
+// PROJECT MEMBERS
+// =========================================================
+
+export const addProjectMember = async (
+  projectId,
+  memberData
+) => {
+  const response = await api.post(
+    `/projects/${projectId}/members/`,
+    memberData
+  );
+
+  return response.data;
+};
+
+export const getProjectMembers = async (projectId) => {
+  const response = await api.get(
+    `/projects/${projectId}/members/`
+  );
+
+  return response.data;
+};
+
+export const updateProjectMember = async (
+  projectId,
+  memberId,
+  memberData
+) => {
+  const response = await api.patch(
+    `/projects/${projectId}/members/${memberId}/`,
+    memberData
+  );
+
+  return response.data;
+};
+
+export const removeProjectMember = async (
+  projectId,
+  memberId
+) => {
+  await api.delete(
+    `/projects/${projectId}/members/${memberId}/`
+  );
+
+  return true;
+};
+
+// =========================================================
 // UPDATE PROJECT
 // =========================================================
 
@@ -352,17 +446,35 @@ export const getBugs = async () => {
 };
 
 export const createBug = async (bugData) => {
-  console.log("Sending bug:", bugData);
-  console.log("API URL:", `${API_BASE_URL}/bugs/`);
+  try {
+    console.log("BUG PAYLOAD:", bugData);
+    console.log(
+      "BUG URL:",
+      `${API_BASE_URL}/bugs/`
+    );
 
-  const response = await api.post(
-    "/bugs/",
-    bugData
-  );
+    const response = await api.post(
+      "/bugs/",
+      bugData
+    );
 
-  console.log("Bug API response:", response.data);
+    console.log(
+      "BUG RESPONSE:",
+      response.data
+    );
 
-  return response.data;
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "BUG CREATE ERROR:",
+      error.response?.data || error
+    );
+
+    throw new Error(
+      getApiErrorMessage(error)
+    );
+  }
 };
 
 export const updateBug = async (
@@ -400,12 +512,39 @@ export const getKnowledgeArticles = async () => {
 export const createKnowledgeArticle = async (
   articleData
 ) => {
-  const response = await api.post(
-    "/knowledge/",
-    articleData
-  );
+  try {
+    console.log(
+      "KNOWLEDGE ARTICLE PAYLOAD:",
+      articleData
+    );
 
-  return response.data;
+    console.log(
+      "KNOWLEDGE URL:",
+      `${API_BASE_URL}/knowledge/`
+    );
+
+    const response = await api.post(
+      "/knowledge/",
+      articleData
+    );
+
+    console.log(
+      "KNOWLEDGE RESPONSE:",
+      response.data
+    );
+
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "KNOWLEDGE CREATE ERROR:",
+      error.response?.data || error
+    );
+
+    throw new Error(
+      getApiErrorMessage(error)
+    );
+  }
 };
 
 export const updateKnowledgeArticle = async (
@@ -441,12 +580,35 @@ export const getTasks = async () => {
 };
 
 export const createTask = async (taskData) => {
-  const response = await api.post(
-    "/tasks/",
-    taskData
-  );
+  try {
+    console.log("TASK PAYLOAD:", taskData);
+    console.log(
+      "TASK URL:",
+      `${API_BASE_URL}/tasks/`
+    );
 
-  return response.data;
+    const response = await api.post(
+      "/tasks/",
+      taskData
+    );
+
+    console.log(
+      "TASK RESPONSE:",
+      response.data
+    );
+
+    return response.data;
+
+  } catch (error) {
+    console.error(
+      "TASK CREATE ERROR:",
+      error.response?.data || error
+    );
+
+    throw new Error(
+      getApiErrorMessage(error)
+    );
+  }
 };
 
 export const updateTask = async (
@@ -496,11 +658,30 @@ export const updateUser = async (
 // =========================================================
 
 export const getActivityLogs = async () => {
-  const response = await api.get(
-    "/activity-logs/"
-  );
+  try {
+    const response = await api.get("/activity-logs/");
 
-  return response.data;
+    console.log(
+      "ACTIVITY LOG API RESPONSE:",
+      response.data
+    );
+
+    if (Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return response.data.results || [];
+
+  } catch (error) {
+    console.error(
+      "ACTIVITY LOG ERROR:",
+      error.response?.data || error
+    );
+
+    throw new Error(
+      getApiErrorMessage(error)
+    );
+  }
 };
 
 // =========================================================

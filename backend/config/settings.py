@@ -38,6 +38,8 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "192.168.29.228",
+    "10.80.212.206",
     ".onrender.com",
 ]
 
@@ -229,26 +231,35 @@ REST_FRAMEWORK = {
 
 
 # =========================================================
-# CORS
+# CORS - LOCAL NETWORK DEVELOPMENT
 # =========================================================
 
-# React development server
-'''CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:3001",
-    "http://127.0.0.1:3001",
-]'''
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 
-# =========================================================
-# CORS
-# =========================================================
-
-#CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "https://manyamridul.github.io",
+    "http://192.168.29.228:3000",
+    "http://10.80.212.206:3000",
+]
+
+CORS_ALLOWED_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+CORS_ALLOWED_HEADERS = [
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
 ]
 
 # =========================================================
