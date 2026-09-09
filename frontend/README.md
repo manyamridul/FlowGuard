@@ -14,8 +14,6 @@ This interface is designed to support:
 
 ## Authors
 
-- Rupa Kumari
-- Tannu Priya
 - Manya Mridul
 
 ## Technology Stack
